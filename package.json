@@ -1,13 +1,21 @@
 {
   "name": "kirchoffslaw_3dlab",
   "version": "1.0.0",
-  "description": "3D Kirchhoff Law Virtual Laboratory with 2D-to-3D Circuit Generator",
+  "description": "Kirchhoff's Law 3D Virtual Lab & AI Circuit Workbench",
   "main": "index.html",
   "scripts": {
-    "start": "npx serve ."
+    "build": "node build.js",
+    "start": "npx serve dist"
   },
   "dependencies": {
     "three": "^0.128.0"
   },
-  "keywords": ["physics", "kirchhoff", "simulation", "threejs", "circuits"]
+  "keywords": [
+    "physics",
+    "kirchhoff",
+    "simulation",
+    "threejs",
+    "circuits",
+    "webgl"
+  ]
 }

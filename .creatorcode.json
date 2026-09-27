@@ -2,5 +2,12 @@
   "project": "KIRCHOFFSLAW_3DLAB",
   "version": "1.0.0",
   "framework": "vanilla-threejs",
-  "target": "web"
+  "target": "web",
+  "publishedTitle": "Kirchoffslaw_3Dlab",
+  "publishedDescription": "An interactive 3D DC circuit simulation laboratory and dual-workbench environment for verifying Kirchhoff's Current Law (KCL) and Voltage Law (KVL). Features synchronized 2D-to-3D circuit building, collision-based polarity probing to resolve sign convention confusion, real-time dynamic nodal solving, an AI 2D image-to-3D circuit generator, and an automated digital lab notebook.",
+  "publishedVersion": "v1",
+  "publishedTags": "kirchhoff, virtual-lab, physics-simulation, threejs, circuit-simulator, kcl, kvl, webgl, stem-education, edtech",
+  "id": "proj-smgaqld",
+  "name": "Kirchoffslaw_3Dlab",
+  "cloudProjectId": "NBRrqCT3Nfqpop2sBS5i"
 }
