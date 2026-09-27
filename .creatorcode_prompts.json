@@ -1,0 +1,6 @@
+{
+  "prompts": [
+    "Build Kirchhoff's Law 3D Virtual Lab workbench with live KCL and KVL verification",
+    "Support 2D image upload to 3D circuit schematic reconstruction"
+  ]
+}

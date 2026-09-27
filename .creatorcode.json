@@ -1,0 +1,6 @@
+{
+  "project": "KIRCHOFFSLAW_3DLAB",
+  "version": "1.0.0",
+  "framework": "vanilla-threejs",
+  "target": "web"
+}

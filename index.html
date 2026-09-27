@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kirchhoff Virtual Lab - 2D &amp; 3D DC Circuit Simulation</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Three.js & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="brand" onclick="switchView('home')">
+      <div class="brand-icon">
+        <span class="bolt">&#9889;</span>
+      </div>
+      <div class="brand-text">
+        <h1>Kirchhoff</h1>
+        <p>Virtual Lab</p>
+      </div>
+    </div>
+
+    <nav>
+      <button type="button" class="nav-btn active" id="nav-btn-home" onclick="switchView('home')">Home</button>
+      <button type="button" class="nav-btn" id="nav-btn-learn" onclick="switchView('learn')">Learn</button>
+      <button type="button" class="nav-btn" id="nav-btn-lab" onclick="switchView('lab')">Virtual Lab</button>
+    </nav>
+
+    <div class="header-right-actions">
+      <!-- Peer Review Mode Toggle -->
+      <button type="button" class="tool-btn peer-btn" id="peerReviewBtn" onclick="togglePeerReviewMode()">
+        &#128101; Peer Review: Off
+      </button>
+
+      <button type="button" class="power-btn" id="headerPowerBtn">&#9632; POWER OFF</button>
+      <div class="user-profile-badge" id="userBadge">
+        <div class="user-avatar" id="avatarInitial">U</div>
+        <span id="userNameText">student@gmail.com</span>
+        <button type="button" class="sign-out-btn" onclick="signOut()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- VIEW 1: HOME / LANDING -->
+  <main class="view-page active" id="view-home">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="hero-tagline">Interactive Electric Circuits</div>
+        <h1 class="hero-heading">Build. Measure. <span>Verify Kirchhoff.</span></h1>
+        <p class="hero-description">
+          Assemble a DC circuit, connect terminals, power it, and inspect live current and voltage values in real-time synchronized 2D &amp; 3D workbenches.
+        </p>
+        <button type="button" class="btn-primary" onclick="switchView('signin')">
+          Sign In &rarr;
+        </button>
+      </div>
+
+      <div class="hero-schematic">
+        <svg viewBox="0 0 540 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="30" width="480" height="350" rx="4" stroke="#1d4ed8" stroke-width="2.5" stroke-dasharray="6 4" opacity="0.4"/>
+          <path d="M 60 210 L 60 70 L 220 70" stroke="#00b4d8" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 320 70 L 460 70 L 460 330 L 60 330 L 60 250" stroke="#00b4d8" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 340 70 L 340 330" stroke="#00b4d8" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M 220 70 L 220 330" stroke="#00b4d8" stroke-width="2.5" stroke-linecap="round"/>
+
+          <line x1="50" y1="220" x2="70" y2="220" stroke="#f59e0b" stroke-width="5" stroke-linecap="round"/>
+          <line x1="42" y1="240" x2="78" y2="240" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+          <text x="35" y="195" fill="#f59e0b" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700">V</text>
+
+          <rect x="215" y="52" width="110" height="36" rx="6" fill="#0d1b2a" stroke="#0284c7" stroke-width="2"/>
+          <path d="M 225 70 L 235 60 L 245 80 L 255 60 L 265 80 L 275 60 L 285 80 L 295 60 L 305 70" stroke="#f59e0b" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+          <text x="260" y="42" fill="#cbd5e1" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" text-anchor="middle">R1</text>
+
+          <rect x="202" y="150" width="36" height="100" rx="6" fill="#0d1b2a" stroke="#0284c7" stroke-width="2"/>
+          <path d="M 220 160 L 210 170 L 230 180 L 210 190 L 230 200 L 210 210 L 230 220 L 220 230" stroke="#f59e0b" stroke-width="2" fill="none" stroke-linejoin="round"/>
+          <text x="180" y="205" fill="#cbd5e1" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700">R3</text>
+
+          <rect x="322" y="150" width="36" height="100" rx="6" fill="#0d1b2a" stroke="#0284c7" stroke-width="2"/>
+          <path d="M 340 160 L 330 170 L 350 180 L 330 190 L 350 200 L 330 210 L 350 220 L 340 230" stroke="#f59e0b" stroke-width="2" fill="none" stroke-linejoin="round"/>
+          <text x="375" y="205" fill="#cbd5e1" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700">R2</text>
+
+          <circle cx="220" cy="70" r="5" fill="#38bdf8"/>
+          <circle cx="340" cy="70" r="5" fill="#38bdf8"/>
+          <circle cx="220" cy="330" r="5" fill="#38bdf8"/>
+          <circle cx="340" cy="330" r="5" fill="#38bdf8"/>
+
+          <text x="385" y="115" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600">&Sigma; I_in = &Sigma; I_out</text>
+          <text x="440" y="370" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600">&Sigma; V = 0</text>
+        </svg>
+      </div>
+    </div>
+  </main>
+
+  <!-- VIEW 2: SIGN IN PORTAL -->
+  <main class="view-page" id="view-signin">
+    <div class="auth-card">
+      <div class="auth-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <h2 class="auth-title">Sign In to Lab</h2>
+      <p class="auth-subtitle">Access interactive DC workbench and 2D circuit-to-3D generator</p>
+
+      <button type="button" class="google-signin-btn" onclick="signInWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        Sign in with Google
+      </button>
+
+      <div class="divider">
+        <span>OR GMAIL SIGN IN</span>
+      </div>
+
+      <form onsubmit="handleEmailSignIn(event)">
+        <div class="form-group">
+          <label for="authEmail">Email Address</label>
+          <input type="email" id="authEmail" class="input-field" placeholder="student@gmail.com" required>
+        </div>
+        <div class="form-group">
+          <label for="authPassword">Password</label>
+          <input type="password" id="authPassword" class="input-field" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="auth-submit-btn">Sign In &rarr;</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- VIEW 3: LEARN (Complete Manual Theory) -->
+  <main class="view-page" id="view-learn">
+    <div class="container">
+      <div class="page-heading">
+        <span>QUICK GUIDE</span>
+        <h1>Kirchhoff's Laws</h1>
+        <p>Learn KCL and KVL through simple theory, diagrams, examples and verification tables.</p>
+      </div>
+
+      <section class="theory-card">
+        <h2>📘 Introduction</h2>
+        <p>Kirchhoff's Laws are two important laws used to analyze electrical circuits. They help us find unknown currents and voltages in complex circuits.</p>
+        <div class="law-boxes">
+          <div class="law-box">
+            <div class="law-icon">&#9889;</div>
+            <h3>KCL</h3>
+            <p>Kirchhoff's Current Law</p>
+            <strong>Based on Conservation of Charge</strong>
+          </div>
+          <div class="law-box">
+            <div class="law-icon">&#128267;</div>
+            <h3>KVL</h3>
+            <p>Kirchhoff's Voltage Law</p>
+            <strong>Based on Conservation of Energy</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="theory-card">
+        <div class="section-title">
+          <span class="number">01</span>
+          <div><h2>Kirchhoff's Current Law</h2><p>KCL — Current at a Junction</p></div>
+        </div>
+        <div class="theory-grid">
+          <div>
+            <h3>Definition</h3>
+            <p>Kirchhoff's Current Law states that the total current entering a junction is equal to the total current leaving the junction.</p>
+            <div class="formula">&Sigma; I<sub>in</sub> = &Sigma; I<sub>out</sub></div>
+            <h3>Easy to Remember</h3>
+            <div class="highlight">Current entering = Current leaving</div>
+          </div>
+          <div class="circuit-diagram">
+            <div class="node">&#9679;</div>
+            <div class="arrow arrow1">&rarr; I₁</div>
+            <div class="arrow arrow2">I₃ &rarr;</div>
+            <div class="arrow arrow3">&darr; I₂</div>
+            <div class="wire wire1"></div>
+            <div class="wire wire2"></div>
+            <div class="wire wire3"></div>
+            <div class="junction-label">JUNCTION</div>
+          </div>
+        </div>
+        <div class="example">
+          <h3>Example</h3>
+          <p>If 5 A enters a junction and 2 A leaves through one branch:</p>
+          <div class="calculation">5 = 2 + I<br><strong>I = 3 A</strong></div>
+        </div>
+      </section>
+
+      <section class="theory-card">
+        <div class="section-title">
+          <span class="number">02</span>
+          <div><h2>Kirchhoff's Voltage Law</h2><p>KVL — Voltage in a Closed Loop</p></div>
+        </div>
+        <div class="theory-grid">
+          <div>
+            <h3>Definition</h3>
+            <p>Kirchhoff's Voltage Law states that the algebraic sum of all voltages around a closed loop is zero.</p>
+            <div class="formula">&Sigma; V = 0</div>
+            <h3>Easy to Remember</h3>
+            <div class="highlight">Voltage gained = Voltage lost</div>
+          </div>
+          <div class="kvl-diagram">
+            <div class="loop-wire top"></div>
+            <div class="loop-wire left"></div>
+            <div class="loop-wire right"></div>
+            <div class="loop-wire bottom"></div>
+            <div class="battery">+ | | &minus;</div>
+            <div class="resistor r1">R₁</div>
+            <div class="resistor r2">R₂</div>
+            <div class="voltage v1">12V</div>
+            <div class="voltage v2">7V</div>
+            <div class="voltage v3">5V</div>
+          </div>
+        </div>
+        <div class="example">
+          <h3>Example</h3>
+          <p>A circuit has a 12 V battery and voltage drops of 7 V and 5 V.</p>
+          <div class="calculation">12 &minus; 7 &minus; 5 = 0<br><strong>KVL is satisfied &check;</strong></div>
+        </div>
+      </section>
+
+      <section class="theory-card">
+        <h2>📊 KCL vs KVL</h2>
+        <div class="table-container">
+          <table>
+            <thead><tr><th>Feature</th><th>KCL</th><th>KVL</th></tr></thead>
+            <tbody>
+              <tr><td>Full Form</td><td>Kirchhoff's Current Law</td><td>Kirchhoff's Voltage Law</td></tr>
+              <tr><td>Based On</td><td>Conservation of Charge</td><td>Conservation of Energy</td></tr>
+              <tr><td>Applied To</td><td>Node / Junction</td><td>Closed Loop</td></tr>
+              <tr><td>Main Quantity</td><td>Current</td><td>Voltage</td></tr>
+              <tr><td>Formula</td><td>&Sigma;I = 0</td><td>&Sigma;V = 0</td></tr>
+              <tr><td>Simple Rule</td><td>Current In = Current Out</td><td>Voltage Rise = Voltage Drop</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="theory-card">
+        <h2>🔌 Important Circuit Terms</h2>
+        <div class="terms-grid">
+          <div class="term"><b>Node</b><span>Point where circuit elements meet.</span></div>
+          <div class="term"><b>Branch</b><span>A path between two nodes.</span></div>
+          <div class="term"><b>Loop</b><span>A closed path in a circuit.</span></div>
+          <div class="term"><b>Current</b><span>Flow of electric charge.</span></div>
+          <div class="term"><b>Voltage</b><span>Electrical potential difference.</span></div>
+          <div class="term"><b>Resistance</b><span>Opposition to current flow.</span></div>
+        </div>
+      </section>
+
+      <section class="theory-card">
+        <h2>🔄 Virtual Lab Flowchart</h2>
+        <div class="flowchart">
+          <div class="flow start">START</div><div class="arrow-down">&darr;</div>
+          <div class="flow">Open Kirchhoff Virtual Lab</div><div class="arrow-down">&darr;</div>
+          <div class="flow">Add Circuit Components</div><div class="arrow-down">&darr;</div>
+          <div class="flow">Connect Components</div><div class="arrow-down">&darr;</div>
+          <div class="decision">Is Circuit Complete?</div>
+          <div class="branches">
+            <div><span>NO</span><div class="flow small">Check Connections</div></div>
+            <div><span>YES</span><div class="flow small">Turn Power ON</div></div>
+          </div>
+          <div class="arrow-down">&darr;</div>
+          <div class="flow">Select KCL Node or KVL Loop</div><div class="arrow-down">&darr;</div>
+          <div class="flow">Take Measurements</div><div class="arrow-down">&darr;</div>
+          <div class="flow">Verify Kirchhoff's Law</div><div class="arrow-down">&darr;</div>
+          <div class="flow end">RESULT VERIFIED &check;</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- VIEW 4: SYNCHRONIZED 2D & 3D VIRTUAL LAB WORKBENCH -->
+  <main class="view-page" id="view-lab">
+    <div class="lab-layout-dual">
+      
+      <!-- LEFT SIDEBAR: COMPONENTS & CONTROLS -->
+      <aside class="sidebar-panel">
+        <div class="panel-header">
+          <h2>COMPONENTS</h2>
+          <button type="button" class="btn-tiny" onclick="clearAllWorkbenches()">CLEAR</button>
+        </div>
+
+        <!-- Custom Component Generator Box[cite: 20, 26] -->
+        <div class="component-config-card">
+          <div class="config-field">
+            <label for="cfgDcVoltage">DC Source (V)</label>
+            <input type="number" id="cfgDcVoltage" class="input-tiny" value="10" min="1" max="100">
+          </div>
+
+          <div class="config-row-3">
+            <div class="config-subfield">
+              <label for="cfgResistorCount">Resistors</label>
+              <input type="number" id="cfgResistorCount" class="input-tiny" value="3" min="1" max="6">
+            </div>
+            <div class="config-subfield">
+              <label for="cfgAmmeterCount">Ammeter</label>
+              <input type="number" id="cfgAmmeterCount" class="input-tiny" value="1" min="0" max="2">
+            </div>
+            <div class="config-subfield">
+              <label for="cfgVoltmeterCount">Voltmeter</label>
+              <input type="number" id="cfgVoltmeterCount" class="input-tiny" value="1" min="0" max="2">
+            </div>
+          </div>
+
+          <button type="button" class="btn-create-components" onclick="generateConfiguredComponents()">
+            CREATE COMPONENTS
+          </button>
+        </div>
+
+        <!-- Real-Time Parameter Sliders -->
+        <div class="component-config-card real-time-controls">
+          <span class="calc-sub-title" style="color: var(--accent-cyan);">⚡ Real-Time Adjuster</span>
+          <div class="slider-param-row">
+            <label>Voltage: <span id="paramVoltLabel">10.00 V</span></label>
+            <input type="range" id="realtimeVoltSlider" min="1" max="50" step="0.5" value="10" oninput="handleRealtimeVoltage(this.value)">
+          </div>
+          <div class="slider-param-row">
+            <label>Selected R: <span id="paramResLabel">40.00 &Omega;</span></label>
+            <input type="range" id="realtimeResSlider" min="1" max="100" step="1" value="40" oninput="handleRealtimeResistance(this.value)">
+          </div>
+        </div>
+
+        <!-- 2D Image Circuit Generator Card[cite: 9, 20, 26] -->
+        <div class="upload-ai-box" onclick="document.getElementById('circuitImageInput').click()">
+          <span class="ai-badge">&#10024; AI 2D &rarr; 3D CONVERTER</span>
+          <div class="upload-prompt-text">Upload 2D Circuit Photo</div>
+          <div class="upload-sub-text">Drop schematic / photo to auto-generate circuit</div>
+          <input type="file" id="circuitImageInput" accept="image/*" onchange="handleImageCircuitUpload(event)">
+        </div>
+
+        <!-- Quick Palette Elements[cite: 4, 20, 26] -->
+        <div class="palette-list">
+          <div class="component-card" onclick="addSingleComponentTo2D('dc')">
+            <div class="comp-info">
+              <div class="comp-icon" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">&#9889;</div>
+              <span>DC Source</span>
+            </div>
+            <span class="comp-val">10 V</span>
+          </div>
+
+          <div class="component-card" onclick="addSingleComponentTo2D('resistor', 40)">
+            <div class="comp-info">
+              <div class="comp-icon" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">&#9647;</div>
+              <span>Resistor</span>
+            </div>
+            <span class="comp-val">40 &Omega;</span>
+          </div>
+
+          <div class="component-card" onclick="addSingleComponentTo2D('resistor', 20)">
+            <div class="comp-info">
+              <div class="comp-icon" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">&#9647;</div>
+              <span>Resistor</span>
+            </div>
+            <span class="comp-val">20 &Omega;</span>
+          </div>
+
+          <div class="component-card" onclick="addSingleComponentTo2D('resistor', 30)">
+            <div class="comp-info">
+              <div class="comp-icon" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">&#9647;</div>
+              <span>Resistor</span>
+            </div>
+            <span class="comp-val">30 &Omega;</span>
+          </div>
+
+          <div class="component-card" onclick="addSingleComponentTo2D('ammeter')">
+            <div class="comp-info">
+              <div class="comp-icon" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">A</div>
+              <span>Ammeter</span>
+            </div>
+            <span class="comp-val">ideal</span>
+          </div>
+
+          <div class="component-card" onclick="addSingleComponentTo2D('voltmeter')">
+            <div class="comp-info">
+              <div class="comp-icon" style="background: rgba(2, 132, 199, 0.2); color: #0284c7;">V</div>
+              <span>Voltmeter</span>
+            </div>
+            <span class="comp-val">probe</span>
+          </div>
+        </div>
+
+        <!-- HOW TO USE GUIDE[cite: 4, 20, 26] -->
+        <div class="how-to-use-box">
+          <h3>HOW TO USE</h3>
+          <ol>
+            <li>Choose resistors and meters, then create components.</li>
+            <li>Drag components onto the workbench.</li>
+            <li>In WIRE mode, connect gold terminals to build closed loops.</li>
+            <li>In PROBE mode, place Red (+) and Black (&minus;) voltmeter leads across elements to verify sign conventions.</li>
+            <li>Click any Node Junction to inspect KCL branch currents.</li>
+          </ol>
+        </div>
+      </aside>
+
+      <!-- CENTER WORKBENCHES: TOP 2D + BOTTOM 3D[cite: 20, 21, 26] -->
+      <section class="dual-viewport-center">
+        
+        <!-- 2D CIRCUIT WORKBENCH[cite: 20, 26] -->
+        <div class="workbench-panel-2d">
+          <div class="canvas-toolbar">
+            <div class="toolbar-left">
+              <span class="canvas-title">2D CIRCUIT WORKBENCH</span>
+              <button type="button" class="tool-btn" onclick="loadDefault2DCircuit()">LOAD DEFAULT CIRCUIT</button>
+              <span class="status-pill" id="liveIndicator">&#9679; Circuit Idle</span>
+            </div>
+            <div class="canvas-actions">
+              <button type="button" class="tool-btn active" id="btn2d-select" onclick="set2DMode('select')">SELECT</button>
+              <button type="button" class="tool-btn" id="btn2d-wire" onclick="set2DMode('wire')">WIRE</button>
+              <button type="button" class="tool-btn probe-toggle-btn" id="btn2d-probe" onclick="set2DMode('probe')">&#128394; PROBE MODE</button>
+            </div>
+          </div>
+
+          <div class="canvas-2d-container" id="container2D">
+            <canvas id="canvas2D"></canvas>
+            <div class="kvl-2d-empty" id="kvl2DEmpty">
+              <span>Workbench is ready. Add components from the left panel or click CREATE COMPONENTS.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MID ACTION STRIP[cite: 20, 26] -->
+        <div class="workbench-action-strip">
+          <div class="action-buttons-left">
+            <button type="button" class="btn-action btn-simulate" onclick="simulateKVL()">
+              &#9889; SIMULATE KVL
+            </button>
+            <button type="button" class="btn-action btn-delete" onclick="deleteSelectedComponent()">
+              DELETE SELECTED
+            </button>
+            <button type="button" class="btn-action btn-reset3d" onclick="reset3DCamera()">
+              RESET 3D VIEW
+            </button>
+            <!-- 3D Flow Arrows & Sign Convention Particles Toggle -->
+            <button type="button" class="btn-action btn-toggle-flow" id="btnFlowToggle" onclick="toggleFlowParticles()">
+              &#10148; 3D Flow Particles: ON
+            </button>
+          </div>
+          <div class="action-notes-right">
+            <span>Drag to rotate &bull; Wheel to zoom &bull; Collision Probing</span>
+          </div>
+        </div>
+
+        <!-- 3D CIRCUIT VIEW[cite: 20, 21, 26] -->
+        <div class="workbench-panel-3d" id="container3D">
+          <div class="overlay-toolbar">
+            <span class="canvas-title">3D CIRCUIT VIEW (Steady-State 60FPS)</span>
+          </div>
+
+          <!-- Peer review pointer overlay -->
+          <div class="peer-indicator-tag" id="peerReviewBadge" style="display: none;">
+            &#128100; Peer Connected: Inspecting Node N1
+          </div>
+
+          <div class="ai-scanning-overlay" id="scanningOverlay">
+            <div class="scan-spinner"></div>
+            <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 6px;">Analyzing 2D Circuit...</h3>
+            <p style="font-size: 0.8rem; color: var(--accent-cyan); font-family: var(--font-mono);">
+              Parsing node topography, calculating branch impedances, and building 3D mesh...
+            </p>
+          </div>
+
+          <div id="three-viewport"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT SIDEBAR: MEASUREMENTS, VERIFICATION & LAB NOTEBOOK -->
+      <aside class="right-telemetry">
+        <div class="panel-header">
+          <h2>MEASUREMENTS</h2>
+          <span style="font-family: var(--font-mono); font-size: 0.7rem; color: #10b981;" id="livePulseTag">&bull; LIVE</span>
+        </div>
+
+        <!-- VERIFY BOTH KIRCHHOFF'S LAWS ACTION -->
+        <div class="verify-action-card">
+          <button type="button" class="btn-verify-both" onclick="verifyBothLaws()">
+            &#10003; VERIFY BOTH KIRCHHOFF'S LAWS
+          </button>
+        </div>
+
+        <!-- JUNCTION / NODE KCL INSPECTOR -->
+        <div class="telemetry-card">
+          <div class="telemetry-label">JUNCTION / NODE KCL (Click Node)</div>
+          <div class="telemetry-value" id="disp-kcl">&Sigma; I = 0.00 A</div>
+          <div class="telemetry-desc" id="disp-kcl-detail">Select a junction to inspect branch currents</div>
+        </div>
+
+        <div class="telemetry-card">
+          <div class="telemetry-label">SELECTED COMPONENT</div>
+          <div class="telemetry-value" id="disp-component-v">0.00 V</div>
+          <div class="telemetry-desc" id="disp-component-name">No component selected</div>
+        </div>
+
+        <!-- DUAL PROBE COLLISION-BASED VOLTMETER -->
+        <div class="telemetry-card probe-telemetry-box">
+          <div class="telemetry-label">DUAL PROBE VOLTMETER (Sign Convention)</div>
+          <div class="probe-chips">
+            <span class="chip-probe chip-red" id="probeRedChip">Red (+): Not Attached</span>
+            <span class="chip-probe chip-black" id="probeBlackChip">Black (&minus;): Not Attached</span>
+          </div>
+          <div class="telemetry-value" id="disp-voltmeter">0.00 V</div>
+          <div class="telemetry-desc" id="disp-voltmeter-desc">Place probes across terminals to measure potential difference &amp; sign (+/&minus;)</div>
+        </div>
+
+        <div class="telemetry-card">
+          <div class="telemetry-label">KVL LOOP CHECK</div>
+          <div class="telemetry-value" id="disp-kvl">&Sigma; V = 0.00 V</div>
+          <div class="telemetry-desc" id="disp-kvl-breakdown">Loop unverified. Connect components and simulate.</div>
+        </div>
+
+        <!-- DETAILED STEP-BY-STEP CALCULATION[cite: 20, 26, 27] -->
+        <div class="telemetry-card calc-details-card">
+          <div class="telemetry-label">CALCULATION BREAKDOWN</div>
+          <div class="calc-math-block">
+            <p>Rtotal = <span id="calc-rtotal">0.00</span> &Omega;</p>
+            <p>I = V / Rtotal</p>
+            <p class="calc-indent">= <span id="calc-vtotal">0.00</span> / <span id="calc-rtotal-2">0.00</span></p>
+            <p class="calc-indent">= <strong id="calc-current">0.000 A</strong></p>
+          </div>
+
+          <div class="calc-drops-section">
+            <div class="calc-sub-title">Voltage Drops &amp; Sign Polarity:</div>
+            <div id="calc-drops-list">
+              <p>No circuit closed.</p>
+            </div>
+          </div>
+
+          <div class="calc-kvl-section">
+            <div class="calc-sub-title">KVL Loop Equation:</div>
+            <p>&Sigma;V = Vs &minus; &Sigma;IR</p>
+            <p class="calc-indent" id="calc-kvl-res">= 0.00 &minus; 0.00</p>
+            <p class="calc-indent"><strong id="calc-kvl-final">= 0.00 V</strong></p>
+          </div>
+        </div>
+
+        <!-- CIRCUIT STATUS & ERROR FLAGGING[cite: 21, 27] -->
+        <div class="telemetry-card status-card">
+          <div class="telemetry-label">CIRCUIT CHECK STATUS</div>
+          <div class="circuit-status-badge" id="circuitStatusBadge">OPEN</div>
+          <div class="telemetry-desc" id="circuitStatusDesc">No closed circuit detected. Build a loop with wires.</div>
+        </div>
+
+        <!-- DIGITAL LAB NOTEBOOK -->
+        <div class="telemetry-card notebook-card">
+          <div class="panel-header" style="border: none; padding: 0;">
+            <div class="telemetry-label">DIGITAL LAB NOTEBOOK</div>
+            <button type="button" class="btn-tiny" onclick="captureMeasurement()">&#128221; CAPTURE</button>
+          </div>
+          <div class="table-container notebook-table-wrap">
+            <table class="notebook-table" id="notebookTable">
+              <thead>
+                <tr>
+                  <th>Probe/Node</th>
+                  <th>Value</th>
+                  <th>Sign</th>
+                </tr>
+              </thead>
+              <tbody id="notebookBody">
+                <tr><td colspan="3" style="text-align: center; color: #64748b;">No captures yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="notebook-sums" id="notebookSums">
+            <span>&Sigma; V<sub>captured</sub>: <strong>0.00 V</strong></span>
+            <span>&Sigma; I<sub>captured</sub>: <strong>0.00 A</strong></span>
+          </div>
+        </div>
+
+      </aside>
+
+    </div>
+  </main>
+
+ <script type="module" src="js/firebase.js"></script>
+  <script type="module" src="js/firebase-auth.js"></script>
+  <script type="module" src="js/maindashboard.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/healthcheck.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kirchhoff-3dlab-deployment
+  labels:
+    app: kirchhoff-3dlab
+spec:
+  replicas: 4 # Scales horizontally for concurrent classroom usage
+  selector:
+    matchLabels:
+      app: kirchhoff-3dlab
+  template:
+    metadata:
+      labels:
+        app: kirchhoff-3dlab
+    spec:
+      containers:
+      - name: web-server
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+        volumeMounts:
+        - name: static-content
+          mountPath: /usr/share/nginx/html
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+      volumes:
+      - name: static-content
+        hostPath:
+          path: /var/www/kirchoffslaw_3dlab
+      - name: nginx-config
+        configMap:
+          name: kirchhoff-nginx-config
